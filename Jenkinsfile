@@ -21,16 +21,15 @@ pipeline {
         
         stage('Docker Build') {
             steps {
-                // Build directly using standard local system hooks
                 sh 'docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest .'
             }
         }
         
         stage('Kubernetes Deployment') {
             steps {
-                // Use the explicit absolute path of minikube's binary configuration mapping
-                sh '/usr/bin/kubectl apply -f deployment.yaml --validate=false'
-                sh '/usr/bin/kubectl rollout status deployment/abc-tech-website'
+                // Point kubectl directly to the verified configuration profile
+                sh '/usr/bin/kubectl apply -f deployment.yaml --kubeconfig=/var/lib/jenkins/.kube/config --validate=false'
+                sh '/usr/bin/kubectl rollout status deployment/abc-tech-website --kubeconfig=/var/lib/jenkins/.kube/config'
             }
         }
     }
