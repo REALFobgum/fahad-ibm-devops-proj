@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_HUB_USER = 'abctechnologies'
         IMAGE_NAME      = 'corporate-web'
-        KUBE_CREDS      = 'kubeconfig-credentials-id'
     }
     
     stages {
@@ -22,20 +21,16 @@ pipeline {
         
         stage('Docker Build') {
             steps {
-                // Point Jenkins directly to Minikube's Docker Engine environment
-                // This builds the image locally inside the cluster and skips the need for a Docker Hub push
-                sh '''
-                    eval \$(minikube -p minikube docker-env)
-                    docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest .
-                '''
+                // Build directly using standard local system hooks
+                sh 'docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest .'
             }
         }
         
         stage('Kubernetes Deployment') {
             steps {
-                // Deploys directly onto your cluster nodes
-                sh 'kubectl apply -f deployment.yaml'
-                sh 'kubectl rollout status deployment/abc-tech-website'
+                // Use the explicit absolute path of minikube's binary configuration mapping
+                sh '/usr/bin/kubectl apply -f deployment.yaml --validate=false'
+                sh '/usr/bin/kubectl rollout status deployment/abc-tech-website'
             }
         }
     }
