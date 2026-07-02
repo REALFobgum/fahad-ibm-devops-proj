@@ -18,11 +18,11 @@
     <build>
         <finalName>abc-tech-website</finalName>
         <plugins>
-            <!-- Standard plugin to package our static web files -->
+            <!-- Official Apache Maven WAR Plugin configured for static content -->
             <plugin>
-                <groupId>maven-plugins</groupId>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.4.0</version>
                 <configuration>
                     <warSourceDirectory>src</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
