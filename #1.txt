@@ -1,0 +1,147 @@
+Started by user Shaik Fahad
+Obtained Jenkinsfile from git https://github.com/REALFobgum/fahad-ibm-devops-proj
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/lib/jenkins/workspace/fahad-DevOps-Pipeline
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > /usr/bin/git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/fahad-DevOps-Pipeline/.git # timeout=10
+Fetching changes from the remote Git repository
+ > /usr/bin/git config remote.origin.url https://github.com/REALFobgum/fahad-ibm-devops-proj # timeout=10
+Fetching upstream changes from https://github.com/REALFobgum/fahad-ibm-devops-proj
+ > /usr/bin/git --version # timeout=10
+ > git --version # 'git version 2.55.0'
+ > /usr/bin/git fetch --tags --force --progress -- https://github.com/REALFobgum/fahad-ibm-devops-proj +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > /usr/bin/git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision b9e464cc9fd922dc4d325d222823bb06d522a006 (refs/remotes/origin/main)
+ > /usr/bin/git config core.sparsecheckout # timeout=10
+ > /usr/bin/git checkout -f b9e464cc9fd922dc4d325d222823bb06d522a006 # timeout=10
+Commit message: "build: inject explicit kubeconfig variable path parameters"
+ > /usr/bin/git rev-list --no-walk b9e464cc9fd922dc4d325d222823bb06d522a006 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Checkout Code)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > /usr/bin/git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/fahad-DevOps-Pipeline/.git # timeout=10
+Fetching changes from the remote Git repository
+ > /usr/bin/git config remote.origin.url https://github.com/REALFobgum/fahad-ibm-devops-proj # timeout=10
+Fetching upstream changes from https://github.com/REALFobgum/fahad-ibm-devops-proj
+ > /usr/bin/git --version # timeout=10
+ > git --version # 'git version 2.55.0'
+ > /usr/bin/git fetch --tags --force --progress -- https://github.com/REALFobgum/fahad-ibm-devops-proj +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > /usr/bin/git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision b9e464cc9fd922dc4d325d222823bb06d522a006 (refs/remotes/origin/main)
+ > /usr/bin/git config core.sparsecheckout # timeout=10
+ > /usr/bin/git checkout -f b9e464cc9fd922dc4d325d222823bb06d522a006 # timeout=10
+Commit message: "build: inject explicit kubeconfig variable path parameters"
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Maven Build)
+[Pipeline] sh
++ mvn clean package
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------< com.abctechnologies:corporate-website >----------------
+[INFO] Building corporate-website 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ corporate-website ---
+[INFO] Deleting /var/lib/jenkins/workspace/fahad-DevOps-Pipeline/target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ corporate-website ---
+[INFO] skip non existing resourceDirectory /var/lib/jenkins/workspace/fahad-DevOps-Pipeline/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ corporate-website ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ corporate-website ---
+[INFO] skip non existing resourceDirectory /var/lib/jenkins/workspace/fahad-DevOps-Pipeline/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ corporate-website ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ corporate-website ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- war:3.4.0:war (default-war) @ corporate-website ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [corporate-website] in [/var/lib/jenkins/workspace/fahad-DevOps-Pipeline/target/abc-tech-website]
+[INFO] Processing war project
+[INFO] Copying webapp resources [/var/lib/jenkins/workspace/fahad-DevOps-Pipeline/src]
+[INFO] Building war: /var/lib/jenkins/workspace/fahad-DevOps-Pipeline/target/abc-tech-website.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.636 s
+[INFO] Finished at: 2026-07-02T21:35:46+05:30
+[INFO] ------------------------------------------------------------------------
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Docker Build)
+[Pipeline] sh
++ docker build -t abctechnologies/corporate-web:latest .
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  158.7kB
+Step 1/4 : FROM nginx:alpine
+ ---> 54f2a904c251
+Step 2/4 : COPY ./src /usr/share/nginx/html
+ ---> Using cache
+ ---> 0e6c7aaa0fee
+Step 3/4 : EXPOSE 80
+ ---> Using cache
+ ---> d92df6626ed1
+Step 4/4 : CMD ["nginx", "-g", "daemon off;"]
+ ---> Using cache
+ ---> ea7e40d716f2
+Successfully built ea7e40d716f2
+Successfully tagged abctechnologies/corporate-web:latest
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Kubernetes Deployment)
+[Pipeline] sh
++ /usr/bin/kubectl apply -f deployment.yaml --kubeconfig=/var/lib/jenkins/.kube/config --validate=false
+deployment.apps/abc-tech-website configured
+service/abc-tech-service unchanged
+[Pipeline] sh
++ /usr/bin/kubectl rollout status deployment/abc-tech-website --kubeconfig=/var/lib/jenkins/.kube/config
+Waiting for deployment "abc-tech-website" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment spec update to be observed...
+Waiting for deployment spec update to be observed...
+Waiting for deployment "abc-tech-website" rollout to finish: 1 old replicas are pending termination...
+deployment "abc-tech-website" successfully rolled out
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Pipeline complete! ABC Technologies Website successfully deployed to Kubernetes.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
